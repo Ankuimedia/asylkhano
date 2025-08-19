@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>B-Rent — аренда видеотехники</title>
+<meta name="description" content="Аренда камер, оптики, света, звука и дронов. Быстрое бронирование и оплата QR. Скидки за длительную аренду." />
+<meta name="theme-color" content="#0b1116" />
+<link rel="canonical" href="https://example.com/" />
+<meta property="og:title" content="B-Rent — аренда видеотехники" />
+<meta property="og:description" content="Камеры, объективы, свет, звук и дроны. Удобное бронирование, QR-оплата, скидки за длительную аренду." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://example.com/" />
+<meta property="og:image" content="https://example.com/og-cover.jpg" />
+<link rel="icon" href="/favicon.ico" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RentalStore",
+  "name": "B-Rent — аренда видеотехники",
+  "image": "https://example.com/logo.png",
+  "url": "https://example.com/",
+  "telephone": "+7-700-000-00-00",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ул. Абая 10",
+    "addressLocality": "Алматы",
+    "addressCountry": "KZ"
+  },
+  "openingHours": "Mo-Su 09:00-21:00",
+  "priceRange": "$$"
+}
+</script>
+
+<style>
+:root{ --bg:#0b1116; --panel:#0f1720; --muted:#98a0ab; --accent:#ef4444; --good:#16a34a; --warn:#f59e0b; --ink:#e5e7eb; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:#fff;font-family:Inter,Arial,Helvetica,sans-serif}
+.app{display:flex;min-height:100vh}
+/* sidebar */
+.sidebar{width:260px;background:var(--panel);padding:22px;display:flex;flex-direction:column;gap:12px;position:fixed;left:0;top:0;bottom:0}
+.brand{font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px}
+.brand img{width:24px;height:24px}
+.cat-btn{background:transparent;border:1px solid #1f2a33;color:#fff;padding:10px;text-align:left;border-radius:8px;cursor:pointer}
+.cat-btn.active{background:#111827;border-color:#24303a}
+.content{margin-left:260px;flex:1;padding:22px}
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.input{background:#081019;border:1px solid #1f2937;padding:10px;border-radius:8px;color:#fff;width:100%}
+.icon-cart{background:#111827;padding:8px 12px;border-radius:10px;cursor:pointer;border:1px solid #24303a}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:18px}
+.card{background:#0f1720;border:1px solid #1f2a33;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.card img{width:100%;height:170px;object-fit:cover;border-radius:8px}
+.card h3{margin:0;font-size:16px}
+.card .meta{color:var(--muted);font-size:13px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px}
+.badge.free{background:rgba(22,163,74,0.12);color:var(--good)}
+.badge.busy{background:rgba(239,68,68,0.12);color:var(--accent)}
+.badge.stock{background:#0c141c;border:1px solid #1f2a33;color:#d0d6dc;margin-left:6px}
+.rating{font-size:14px;color:#ffd54f}
+.btn{background:var(--accent);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;transition:opacity .15s ease}
+.btn.ghost{background:transparent;border:1px solid #24303a}
+.btn.small{padding:6px 10px;font-size:12px}
+.btn.disabled,.btn:disabled{background:#6b7280;border-color:#4b5563;cursor:not-allowed;opacity:.6}
+.add-btn{min-width:120px}
+.side-panel{margin-top:16px;background:#0f1720;border-radius:12px;padding:12px;border:1px solid #1f2a33}
+.cart-list{display:flex;flex-direction:column;gap:8px}
+.cart-row{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:#081018;border:1px solid #1b2630}
+.small{font-size:13px;color:var(--muted)}
+.footer{margin-top:26px;color:var(--muted);font-size:13px;text-align:center}
+/* detail */
+.detail{background:#0f1720;padding:18px;border-radius:12px;border:1px solid #1f2a33}
+.gallery{display:flex;gap:8px}
+.gallery img{width:100%;height:360px;object-fit:cover;border-radius:8px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:90}
+.modal-box{background:#071018;padding:18px;border-radius:12px;border:1px solid #18323f;max-width:540px;width:100%}
+.hide{display:none}
+/* toast */
+.toast{position:fixed;right:16px;bottom:16px;background:#0b1a24;border:1px solid #143646;padding:10px 12px;border-radius:10px;z-index:99;min-width:220px}
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter-chip{border:1px solid #1f2a33;background:#0c141c;padding:6px 10px;border-radius:999px;cursor:pointer;font-size:12px}
+.filter-chip.active{background:#111b26}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.range{display:flex;gap:8px;align-items:center}
+.range input[type=number]{width:110px}
+.sort{display:flex;gap:8px;align-items:center}
+/* mobile toolbar */
+.mobile-toolbar{position:fixed;left:0;right:0;bottom:0;background:#0f1720;border-top:1px solid #1f2a33;padding:10px;display:none;z-index:60}
+.mobile-toolbar .bar{display:flex;justify-content:space-between;align-items:center}
+.mobile-toolbar .bar .btn{padding:10px 14px}
+
+/* ===== ADMIN ===== */
+.admin-header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:#0c141c;border:1px solid #1f2a33;color:#fff;padding:8px 12px;border-radius:999px;cursor:pointer}
+.tab.active{background:#111b26}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border:1px solid #1f2a33;padding:8px;text-align:left}
+.table th{background:#0c141c;color:var(--ink)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
+.kpi .box{background:#0f1720;border:1px solid #1f2a33;border-radius:12px;padding:12px}
+.tag{display:inline-block;background:#0c141c;border:1px solid #1f2a33;padding:2px 8px;border-radius:999px;font-size:12px}
+.status-paid{color:var(--good)}
+.status-pending{color:var(--warn)}
+.status-issued{color:#60a5fa}
+.status-returned{color:#c084fc}
+.login-card{max-width:360px;margin:24px auto;background:#0f1720;border:1px solid #1f2a33;border-radius:12px;padding:16px}
+
+/* responsive */
+@media(max-width:900px){
+  .sidebar{position:relative;width:100%;height:auto;display:flex;flex-direction:row;overflow:auto;padding:10px;gap:8px}
+  .content{margin-left:0;padding:12px}
+  .header{flex-direction:column;align-items:stretch}
+  .gallery img{height:240px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+  .mobile-toolbar{display:block}
+  body{padding-bottom:64px}
+}
+</style>
+
+<!-- === Modern visual uplift (non-breaking) === -->
+<style id="theme-modern">
+:root{
+  --gradient: radial-gradient(1200px 800px at 10% -10%,rgba(239,68,68,.16),transparent),
+              radial-gradient(1000px 700px at 90% 10%,rgba(96,165,250,.12),transparent);
+  --outline: 0 0 0 2px rgba(239,68,68,.35), 0 10px 20px rgba(0,0,0,.25);
+}
+/* Base background with soft gradients */
+body{
+  background-image: var(--gradient);
+  background-attachment: fixed;
+}
+/* Panels: glass effect + subtle border */
+.side-panel,.login-card,.detail,.modal-box{
+  background: linear-gradient(180deg, rgba(15,23,32,.86), rgba(10,16,24,.86));
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  backdrop-filter: saturate(120%) blur(6px);
+}
+/* Sidebar polish */
+.sidebar{
+  background: linear-gradient(180deg, #0f1720 0%, #0b1116 100%);
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+.brand{letter-spacing:.2px}
+.cat-btn{
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.06);
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+.cat-btn:hover{background:#101826;border-color:#334454}
+.cat-btn.active{
+  background:linear-gradient(180deg,#111b26,#0d1621);
+  border-color:#394b5a;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+}
+/* Inputs: focus ring */
+.input, select{
+  transition: box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+.input:focus, select:focus{
+  outline: none;
+  border-color:#365672;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.25);
+  background:#0a1520;
+}
+/* Buttons */
+.btn{
+  border-radius:12px;
+  font-weight:600;
+  letter-spacing:.2px;
+  transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease, background .16s ease;
+  box-shadow: 0 6px 16px rgba(239,68,68,.28);
+}
+.btn:hover{transform: translateY(-1px)}
+.btn:active{transform: translateY(0)}
+.btn.ghost{
+  border-color: rgba(255,255,255,.10);
+  box-shadow:none;
+}
+.btn.ghost:hover{background:#0e1823;border-color:#3a4b5a}
+/* Cart icon */
+.icon-cart{transition: transform .16s ease, box-shadow .16s ease}
+.icon-cart:hover{transform: translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,.3)}
+
+/* Cards */
+.card{
+  border:1px solid rgba(255,255,255,.06);
+  background: linear-gradient(180deg, rgba(16,24,35,.92), rgba(12,18,27,.92));
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0,0,0,.45);
+  border-color: rgba(255,255,255,.12);
+}
+.card img{filter: saturate(105%);}
+
+/* Badges with gentle glow */
+.badge{border:1px solid rgba(255,255,255,.08)}
+.badge.free{box-shadow:0 0 0 2px rgba(22,163,74,.08) inset}
+.badge.busy{box-shadow:0 0 0 2px rgba(239,68,68,.08) inset}
+.badge.stock{background:rgba(12,20,28,.7)}
+
+/* Gallery image rounded + shadow */
+.gallery img{box-shadow:0 12px 28px rgba(0,0,0,.35)}
+
+/* Toast: slide-in */
+@keyframes slideIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast{animation: slideIn .25s ease}
+
+/* Tables: zebra and rounded corners */
+.table{border-radius:12px;overflow:hidden}
+.table tr:nth-child(even){background:#0b131b}
+.table th{border-bottom:1px solid rgba(255,255,255,.06)}
+
+/* Footer fade */
+.footer{opacity:.8}
+
+/* Mobile toolbar polish */
+.mobile-toolbar{backdrop-filter: blur(6px); background: rgba(15,23,32,.86)}
+
+/* Focus-visible for keyboard users */
+:focus-visible{outline: 2px solid rgba(59,130,246,.6); outline-offset:3px; border-radius:10px}
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Навигация по категориям">
+    <div class="brand" id="brandGoHome"><img src="https://example.com/logo.png" alt="B-Rent"/> B-Rent</div>
+    <div class="small">Категории</div>
+    <button class="cat-btn active" data-cat="all">Все</button>
+    <button class="cat-btn" data-cat="camera">📷 Камеры</button>
+    <button class="cat-btn" data-cat="lens">🎯 Объективы</button>
+    <button class="cat-btn" data-cat="light">💡 Свет</button>
+    <button class="cat-btn" data-cat="drone">🚁 Дроны</button>
+    <button class="cat-btn" data-cat="sound">🎙 Звук</button>
+    <button class="cat-btn" data-cat="accessory">🎒 Аксессуары</button>
+
+    <div class="side-panel" aria-live="polite">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Корзина</strong></div>
+        <div id="cartCountBadge" class="small">0</div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="cart-list" id="sidebarCartList"></div>
+      <div style="height:10px"></div>
+      <button class="btn" id="goToCartBtn">Перейти в корзину</button>
+      <button class="btn ghost small" id="openAdmin">Админ-панель</button>
+    </div>
+    <div style="flex:1"></div>
+    <div class="small">© <span id="yearNow"></span> B-Rent</div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button id="navCatalog" class="btn ghost">Каталог</button>
+        <button id="navCart" class="btn ghost">Корзина</button>
+        <button id="navAdmin" class="btn ghost">Админ</button>
+      </div>
+      <div>
+        <h1 style="margin:0;cursor:pointer;font-size:20px" id="titleGoHome">Каталог техники</h1>
+        <div class="small" style="margin-top:6px">Выбирайте даты, фильтры, добавляйте в корзину — оплатите в конце</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;width:100%;max-width:620px">
+        <div class="search" style="flex:1">
+          <input id="searchInput" class="input" placeholder="Поиск: название, характеристики" aria-label="Поиск" />
+        </div>
+        <div class="icon-cart" id="topCartBtn" title="Открыть корзину" aria-label="Открыть корзину">🛒 <span id="topCartCount">0</span></div>
+      </div>
+    </div>
+
+    <!-- Quick filters and controls -->
+    <div class="side-panel" style="margin-top:12px">
+      <div class="controls">
+        <div class="filters" aria-label="Быстрые фильтры">
+          <div class="filter-chip" data-filter="4k">4K/120fps</div>
+          <div class="filter-chip" data-filter="8k">8K</div>
+          <div class="filter-chip" data-filter="stabilization">Стабилизация</div>
+          <div class="filter-chip" data-filter="drone">Дроны 40+ мин</div>
+        </div>
+        <div class="range">
+          <label class="small">Цена от</label>
+          <input id="minPrice" type="number" class="input" placeholder="мин" />
+          <label class="small">до</label>
+          <input id="maxPrice" type="number" class="input" placeholder="макс" />
+        </div>
+        <div class="sort">
+          <label class="small" for="sortBy">Сортировка</label>
+          <select id="sortBy" class="input" style="max-width:220px">
+            <option value="popular">По популярности</option>
+            <option value="priceAsc">Цена ↑</option>
+            <option value="priceDesc">Цена ↓</option>
+            <option value="new">Новинки</option>
+          </select>
+        </div>
+        <button id="clearFilters" class="btn ghost small" title="Сбросить фильтры">Сбросить</button>
+      </div>
+      <div class="small" style="margin-top:6px">Занятые позиции при выбранных датах подсвечиваются красной меткой.</div>
+    </div>
+
+    <!-- Date bar -->
+    <div class="side-panel" style="margin-top:12px">
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label class="small">Дата начала</label>
+          <input id="globalStart" type="date" />
+        </div>
+        <div>
+          <label class="small">Дата окончания</label>
+          <input id="globalEnd" type="date" />
+        </div>
+        <div style="flex:1"></div>
+        <button id="applyDatesBtn" class="btn ghost">Применить к корзине</button>
+        <button id="shareCartBtn" class="btn ghost" title="Ссылка на корзину">Поделиться корзиной</button>
+      </div>
+      <div class="small" id="dateHint" style="margin-top:6px">Скидки: 3+ дней −5%, 7+ дней −10%, 14+ дней −15% (автоматически применяются).</div>
+    </div>
+
+    <!-- Catalog grid -->
+    <section id="catalogSection" style="margin-top:18px">
+      <div id="catalogGrid" class="grid"></div>
+    </section>
+
+    <!-- Product detail -->
+    <section id="productDetail" class="hide" style="margin-top:18px"></section>
+
+    <!-- Cart / Checkout -->
+    <section id="cartSection" class="hide" style="margin-top:18px">
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:320px">
+          <div class="side-panel">
+            <h2 style="margin:0 0 10px">🛒 Корзина</h2>
+            <div id="cartItemsList"></div>
+            <div style="height:12px"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div class="small">Сумма за сутки</div>
+              <div id="sumPerDay">0 тг</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <div class="small">Дней аренды</div>
+              <div id="daysCount">1</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <div class="small">Скидка за длительность</div>
+              <div id="durationDiscount">0 тг</div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+              <div>
+                <label class="small">Дата начала</label>
+                <input id="startDate" type="date" />
+              </div>
+              <div>
+                <label class="small">Дата окончания</label>
+                <input id="endDate" type="date" />
+              </div>
+            </div>
+            <div style="height:12px"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn" id="checkoutBtn">Сохранить заказ</button>
+              <button class="btn ghost" id="chooseMoreBtn">Выбирать ещё</button>
+            </div>
+            <div style="margin-top:12px;text-align:center" id="checkoutNotice" class="small muted"></div>
+          </div>
+        </div>
+
+        <div style="width:430px;min-width:280px">
+          <div class="side-panel">
+            <h3 style="margin:0 0 10px">Данные клиента</h3>
+            <input id="firstName" class="input" placeholder="Имя" autocomplete="given-name" />
+            <div style="height:6px"></div>
+            <input id="lastName" class="input" placeholder="Фамилия" autocomplete="family-name" />
+            <div style="height:6px"></div>
+            <input id="phone" class="input" placeholder="Телефон (+7 7xx xxx xx xx)" inputmode="tel" autocomplete="tel" />
+            <div style="height:6px"></div>
+            <input id="email" class="input" placeholder="Email (необязательно)" inputmode="email" autocomplete="email" />
+            <div style="height:10px"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <input id="promo" class="input" placeholder="Промокод (необязательно)" style="flex:1" />
+              <button id="applyPromo" class="btn small">Применить</button>
+            </div>
+            <div id="promoNote" class="small" style="margin-top:6px"></div>
+            <div style="height:10px"></div>
+            <div style="font-weight:600">Итого к оплате</div>
+            <div id="grandTotal" style="font-size:20px;font-weight:700;margin-top:6px">0 тг</div>
+            <div class="small" id="grandTotalNote"></div>
+            <div style="height:10px"></div>
+            <button class="btn" id="openPayBtn">Оплатить QR</button>
+            <div style="height:8px"></div>
+            <button class="btn ghost" id="confirmPaidBtn">Я оплатил (подтвердить)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ADMIN PANEL ===== -->
+    <section id="adminSection" class="hide" style="margin-top:18px">
+      <div class="side-panel">
+        <div class="admin-header">
+          <strong>Админ-панель</strong>
+          <span id="adminUserTag" class="tag">Гость</span>
+          <button id="adminLogout" class="btn ghost small">Выйти</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="tab active" data-tab="dashboard">Dashboard</button>
+          <button class="tab" data-tab="inventory">Склад</button>
+          <button class="tab" data-tab="orders">Заказы</button>
+          <button class="tab" data-tab="clients">Клиенты</button>
+          <button class="tab" data-tab="settings">Настройки</button>
+        </div>
+        <div id="adminContent"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN login -->
+    <section id="adminLoginSection" class="hide" style="margin-top:18px">
+      <div class="login-card">
+        <h3 style="margin:0 0 10px">Вход в админ-панель</h3>
+        <input id="adminLogin" class="input" placeholder="Логин" autocomplete="username" />
+        <div style="height:6px"></div>
+        <input id="adminPassword" class="input" placeholder="Пароль" type="password" autocomplete="current-password" />
+        <div style="height:10px"></div>
+        <button class="btn" id="adminDoLogin">Войти</button>
+        <div class="small" style="margin-top:8px">Подсказка для демо: admin / admin123</div>
+      </div>
+    </section>
+
+    <div class="footer">Если возникли вопросы — напишите нам в WhatsApp</div>
+  </main>
+</div>
+
+<!-- Mobile toolbar -->
+<div class="mobile-toolbar">
+  <div class="bar">
+    <div class="small">В корзине: <span id="mobCartCount">0</span> • Итого: <span id="mobCartTotal">0 тг</span></div>
+    <button class="btn" id="mobOpenCart">Оформить</button>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div id="qrModal" class="modal hide" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h3>Оплата</h3>
+    <p class="small">Сумма: <span id="qrAmount">0 тг</span></p>
+    <div style="display:flex;justify-content:center;margin:12px 0">
+      <img id="kaspiQr" src="" alt="QR" style="width:280px;height:280px;object-fit:contain;border-radius:8px;background:#071b20;padding:10px;border:1px solid #18323f">
+    </div>
+    <ol class="small" style="margin:0 0 12px 18px">
+      <li>Откройте приложение банка</li>
+      <li>Сканируйте QR и оплатите.</li>
+      <li>После перевода нажмите «Я оплатил».</li>
+    </ol>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="paidBtnModal">Я оплатил</button>
+      <button class="btn ghost" id="closeQrModal">Отмена</button>
+      <button class="btn ghost" id="copyPayLink">Скопировать ссылку</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hide"></div>
+
+<script>
+/* ----------------- CONFIG ----------------- */
+const APPS_SCRIPT_URL = ""; // вставьте ваш /exec (можно оставить пустым — будет демо)
+const ORDER_WEBHOOK_URL = APPS_SCRIPT_URL; // doPost того же скрипта
+const CURRENCY = "тг";
+const QR_API_BASE = "https://api.qrserver.com/v1/create-qr-code/"; // генерация картинки QR
+const PAY_LINK_BASE = "b-rent://pay"; // замените на реальный deeplink, если есть
+// ===== ADMIN CONFIG =====
+const ADMIN_LOGIN = 'admin';
+const ADMIN_PASSWORD = 'admin123'; // замените!
+/* ------------------------------------------ */
+
+/* ---------- State ---------- */
+let state = { category:'all', q:'', cart:[], startDate:'', endDate:'', promo:null, sortBy:'popular', minPrice:null, maxPrice:null };
+let ADMIN = { loggedIn: false, user: null, tab:'dashboard' };
+
+/* ---------- Helpers ---------- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const todayStr = ()=> new Date().toISOString().slice(0,10);
+function fmt(n){ return Number(n||0).toLocaleString('ru-RU'); }
+function t(n){ return `${fmt(n)} ${CURRENCY}` }
+function parseMoney(str){ return Number(String(str).replace(/\s|[^\d.]/g,'')||0); }
+function daysBetween(s,e){ if(!s||!e) return 1; const sd=new Date(s); const ed=new Date(e); const diff=Math.ceil((ed-sd)/(1000*60*60*24))+1; return Math.max(1,diff); }
+function getCartQty(id){ return state.cart.find(c=>c.id===id)?.qty||0; }
+function overlapWithBusy(p, s, e){ if(!p.busyUntil) return false; const busyUntil = new Date(p.busyUntil); if(!s||!e) return (p.status==='busy' && busyUntil >= new Date(new Date().setHours(0,0,0,0))); const start = new Date(s); return start <= busyUntil; }
+function availableForUser(p){ const stock = Number(p.stock||1); if(overlapWithBusy(p, state.startDate, state.endDate)) return 0; const left = stock - getCartQty(p.id); return Math.max(0,left); }
+function showToast(msg){ const el=$('#toast'); if(!el) return; el.textContent=msg; el.classList.remove('hide'); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.add('hide'), 2400); }
+function copyToClipboard(text){ navigator.clipboard?.writeText(text).then(()=>showToast('Ссылка скопирована')).catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('Скопировано'); }); }
+function safeText(sel, text){ const el=$(sel); if(el) el.textContent = text; }
+
+/* ---------- Persistence ---------- */
+const LS_KEY = 'brent_state_v6';
+const LS_ORDERS_KEY = 'brent_orders_v1';
+function loadState(){ try{ const raw=localStorage.getItem(LS_KEY); if(!raw) return; const s=JSON.parse(raw); state={...state, ...s}; }catch(e){} }
+function saveState(){ const s={ cart:state.cart, startDate:state.startDate, endDate:state.endDate, promo:state.promo, q:state.q, category:state.category, sortBy:state.sortBy, minPrice:state.minPrice, maxPrice:state.maxPrice }; localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+function getOrders(){ try{ return JSON.parse(localStorage.getItem(LS_ORDERS_KEY)||'[]'); }catch(e){ return []; } }
+function saveOrders(list){ localStorage.setItem(LS_ORDERS_KEY, JSON.stringify(list)); }
+
+/* ---------- UTM + Referral ---------- */
+function getUrlParams(){ return new URLSearchParams(location.search); }
+function captureUtm(){ const p=getUrlParams(); const keys=['utm_source','utm_medium','utm_campaign','utm_term','utm_content','ref']; const out={}; keys.forEach(k=>{ const v=p.get(k); if(v) out[k]=v; }); if(Object.keys(out).length){ localStorage.setItem('brent_utm', JSON.stringify(out)); } }
+
+/* ---------- Products (Sheets API with fallback) ---------- */
+let PRODUCTS = [];
+async function fetchProducts(){
+  try {
+    const DEMO = [
+      { id:1, slug:"sony-a7s3", category:"camera", title:"Sony A7S III", price:20000, images:["https://picsum.photos/seed/sonya/800/600","https://picsum.photos/seed/sonya2/800/600"], description:"Полнокадровая камера для видео с отличной чувствительностью и 4K.", specs:{Sensor:"Full Frame", Video:"4K/120fps", Year:2021}, status:"free", busyUntil:"", rating:4.9, popular:95, stock:3 },
+      { id:2, slug:"canon-r5", category:"camera", title:"Canon R5", price:18000, images:["https://picsum.photos/seed/canonr5/800/600"], description:"Профессиональная камера Canon R5.", specs:{Sensor:"Full Frame", Video:"8K", Stabilization:"Yes", Year:2020}, status:"busy", busyUntil:"2025-08-25", rating:4.7, popular:90, stock:2 },
+      { id:3, slug:"sigma-24-70", category:"lens", title:"Sigma 24-70mm f/2.8", price:8000, images:["https://picsum.photos/seed/sigma/800/600"], description:"Универсальный стандартный зум.", specs:{Mount:"Sony E", Aperture:"f/2.8", Year:2019}, status:"free", busyUntil:"", rating:4.8, popular:80, stock:5 },
+      { id:4, slug:"aputure-120d", category:"light", title:"Aputure 120D II", price:12000, images:["https://picsum.photos/seed/aputure/800/600"], description:"Мощный LED осветитель.", specs:{Power:"120W", Type:"LED", Year:2018}, status:"free", busyUntil:"", rating:4.6, popular:70, stock:4 },
+      { id:5, slug:"dji-mavic-3", category:"drone", title:"DJI Mavic 3", price:25000, images:["https://picsum.photos/seed/dji/800/600"], description:"Профессиональный дрон для аэросъемки.", specs:{FlightTime:"45 min", Camera:"Hasselblad", Year:2022}, status:"free", busyUntil:"", rating:4.9, popular:92, stock:2 },
+      { id:6, slug:"zoom-h6", category:"sound", title:"Zoom H6", price:4000, images:["https://picsum.photos/seed/zoomh6/800/600"], description:"Многофункциональный рекордер.", specs:{Channels:"4-6", Battery:"AA", Year:2017}, status:"busy", busyUntil:"2025-08-23", rating:4.5, popular:65, stock:6 },
+      { id:7, slug:"gimbal-ronin", category:"accessory", title:"Ronin-S Gimbal", price:10000, images:["https://picsum.photos/seed/ronin/800/600"], description:"Стабилизатор для камер.", specs:{Load:"3kg", Battery:"12h", Year:2019}, status:"free", busyUntil:"", rating:4.6, popular:85, stock:3 }
+    ];
+
+    if(!APPS_SCRIPT_URL){ PRODUCTS = DEMO; return; }
+    const r = await fetch(APPS_SCRIPT_URL + "?action=products");
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const json = await r.json();
+    PRODUCTS = (json && json.products && json.products.length) ? json.products : DEMO;
+  } catch(e){ console.error(e); PRODUCTS = PRODUCTS?.length ? PRODUCTS : []; if(!PRODUCTS.length){ showToast('Каталог: показаны демо-товары'); await new Promise(res=>setTimeout(res,0)); PRODUCTS = [ { id:1, slug:"demo", category:"camera", title:"Demo Cam", price:10000, images:["https://picsum.photos/seed/demo/800/600"], description:"Demo", specs:{Year:2020}, status:"free", busyUntil:"", rating:4.5, popular:50, stock:1 } ]; }
+  }
+}
+
+/* ---------- Price bounds ---------- */
+function setPriceBounds(){ if(!PRODUCTS.length) return; const prices=PRODUCTS.map(p=>p.price); const min=Math.min(...prices); const max=Math.max(...prices); if(!state.minPrice) state.minPrice=min; if(!state.maxPrice) state.maxPrice=max; const minEl=$('#minPrice'), maxEl=$('#maxPrice'); if(minEl) minEl.value=state.minPrice; if(maxEl) maxEl.value=state.maxPrice; }
+
+/* ---------- Render helpers ---------- */
+function stars(r){ const full=Math.floor(r); const half=(r-full)>=0.5; return '★'.repeat(full) + (half?'½':'') + `<span class="small" style="margin-left:6px;color:var(--muted)">${(r||0).toFixed(1)}</span>`; }
+function stockBadge(p){ const left = availableForUser(p); if(left<=0) return '<span class="badge busy">Нет в наличии</span>'; if(left===1) return '<span class="badge stock">Осталась 1 шт.</span>'; return `<span class="badge stock">В наличии: ${left} шт.</span>`; }
+function sortProducts(list){ const s=state.sortBy; const arr=[...list]; if(s==='priceAsc') arr.sort((a,b)=>a.price-b.price); else if(s==='priceDesc') arr.sort((a,b)=>b.price-a.price); else if(s==='new') arr.sort((a,b)=>(b.specs?.Year||0)-(a.specs?.Year||0)); else arr.sort((a,b)=>(b.popular||0)-(a.popular||0)); return arr; }
+
+/* ---------- Render Catalog ---------- */
+function renderCatalog(){
+  const grid=$('#catalogGrid'); if(!grid) return; grid.innerHTML='';
+  const q = ($('#searchInput')?.value||'').trim().toLowerCase(); state.q=q;
+  const activeFilters = $$('.filter-chip.active').map(ch=>ch.dataset.filter);
+  const minP = Number($('#minPrice')?.value||0); const maxP = Number($('#maxPrice')?.value||Infinity); state.minPrice=minP; state.maxPrice=maxP;
+  let filtered = PRODUCTS.filter(p=>{
+    const catOk = state.category==='all' || p.category===state.category;
+    const qOk = !q || p.title.toLowerCase().includes(q) || JSON.stringify(p.specs).toLowerCase().includes(q);
+    const fOk = !activeFilters.length || activeFilters.every(f=>{
+      if(f==='4k') return (p.specs?.Video||'').includes('4K');
+      if(f==='8k') return (p.specs?.Video||'').includes('8K');
+      if(f==='stabilization') return (p.specs?.Stabilization||'No')==='Yes';
+      if(f==='drone') return (p.category==='drone' && String(p.specs?.FlightTime||'').match(/(4[0-9]|[5-9][0-9])/));
+      return true;
+    });
+    const priceOk = p.price>=minP && p.price<=maxP;
+    return catOk && qOk && fOk && priceOk;
+  });
+  filtered = sortProducts(filtered);
+
+  const s = state.startDate, e = state.endDate;
+  filtered.forEach(p=>{
+    const noneLeft = availableForUser(p)===0;
+    const busy = overlapWithBusy(p, s, e) || noneLeft;
+    const availText = busy ? ('Занято'+ (p.busyUntil? ' до '+ new Date(p.busyUntil).toLocaleDateString('ru-RU') : '')) : 'Свободно';
+    const disabledAttrs = busy ? 'disabled' : '';
+    const disabledClass = busy ? 'disabled' : '';
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <img src="${(p.images&&p.images[0])||''}" alt="${p.title}" loading="lazy">
+      <h3>${p.title}</h3>
+      <div class="meta">${(p.category||'').toUpperCase()} • ${p.specs?.Year||''}</div>
+      <div class="rating" aria-label="Рейтинг">${stars(p.rating||4.7)}</div>
+      <div class="price" style="font-weight:600">${t(p.price)} / сутки</div>
+      <div>
+        <span class="status badge ${busy? 'busy':'free'}">${availText}</span>
+        ${stockBadge(p)}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn add-btn ${disabledClass}" data-add="${p.id}" ${disabledAttrs}>Добавить</button>
+        <button class="btn ghost" data-open="${p.slug||p.id}">Подробнее</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',()=>{ if(btn.classList.contains('disabled')||btn.disabled) return; addToCart(Number(btn.getAttribute('data-add'))); btn.textContent='Добавлено'; setTimeout(()=>btn.textContent='Добавить',700); }));
+  grid.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>{ const slug=btn.getAttribute('data-open'); location.hash = 'product/'+slug; }));
+  updateTopCounts(); saveState(); updateMobileBar();
+}
+
+/* ---------- Sidebar Cart ---------- */
+function renderSidebarCart(){ const listEl=$('#sidebarCartList'); if(!listEl) return; listEl.innerHTML=''; if(state.cart.length===0){ const empty=document.createElement('div'); empty.className='small'; empty.textContent='Корзина пуста'; listEl.appendChild(empty); } else { state.cart.forEach(ci=>{ const el=document.createElement('div'); el.className='small'; el.textContent=`${ci.title} x${ci.qty} — ${t(ci.price*ci.qty)}`; listEl.appendChild(el); }) } const cnt=state.cart.reduce((s,i)=>s+i.qty,0); safeText('#cartCountBadge', String(cnt)); safeText('#topCartCount', String(cnt)); safeText('#mobCartCount', String(cnt)); }
+function updateTopCounts(){ renderSidebarCart(); }
+
+/* ---------- Cart Section ---------- */
+function durationDiscount(sumPerDay, d){ let rate = 0; if(d>=14) rate=0.15; else if(d>=7) rate=0.10; else if(d>=3) rate=0.05; const disc = Math.round(sumPerDay*d*rate); return {disc, rate}; }
+function renderCartSection(){ const list=$('#cartItemsList'); if(!list) return; list.innerHTML=''; const d=daysBetween(state.startDate, state.endDate); safeText('#daysCount', String(d)); if(state.cart.length===0){ list.innerHTML='<div class="small">Корзина пуста</div>'; safeText('#sumPerDay', t(0)); safeText('#grandTotal', t(0)); safeText('#grandTotalNote',''); safeText('#durationDiscount', t(0)); updateMobileBar(); return; } let sumPerDay=0; state.cart.forEach(ci=>{ sumPerDay += ci.price*ci.qty; const p = PRODUCTS.find(x=>x.id===ci.id) || {}; const conflict = overlapWithBusy(p, state.startDate, state.endDate); const row=document.createElement('div'); row.className='cart-row'; row.innerHTML=`<div style="flex:1">${ci.title} ${conflict? '<span class="badge busy">конфликт дат</span>':''}<div class="small">${t(ci.price)} / сутки</div></div><div style="display:flex;gap:6px;align-items:center"><button class="btn ghost" data-dec="${ci.id}">−</button><div style="min-width:28px;text-align:center">${ci.qty}</div><button class="btn ghost" data-inc="${ci.id}">+</button><button class="btn ghost" data-rem="${ci.id}">Удалить</button></div><div style="min-width:140px;text-align:right">${t(ci.price*ci.qty*d)}</div>`; list.appendChild(row); }); list.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{ changeQty(Number(b.getAttribute('data-dec')),-1); })); list.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{ changeQty(Number(b.getAttribute('data-inc')),+1); })); list.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>{ removeFromCart(Number(b.getAttribute('data-rem'))); })); safeText('#sumPerDay', t(sumPerDay)); const dur=durationDiscount(sumPerDay, d); const totalRaw = sumPerDay*d - dur.disc; safeText('#durationDiscount', dur.disc ? `−${t(dur.disc)}` : t(0)); const total = applyPromoIfAny(totalRaw); safeText('#grandTotal', t(total)); const promoText = state.promo? `Промокод: ${state.promo.code} (−${state.promo.type==='percent'? state.promo.value+'%': t(state.promo.value)})` : ''; const durText = dur.rate ? `Скидка за длительность: −${Math.round(dur.rate*100)}%` : ''; safeText('#grandTotalNote', [durText, promoText].filter(Boolean).join(' • ')); saveState(); updateMobileBar(); }
+
+/* ---------- Product Detail ---------- */
+function productJsonLd(p){ return { "@context":"https://schema.org", "@type":"Product", "name": p.title, "image": p.images?.[0]||'', "description": p.description||'', "brand": {"@type":"Brand","name": (p.title.split(' ')[0]||'')}, "offers": {"@type":"Offer","priceCurrency":"KZT","price": String(p.price),"availability": availableForUser(p)>0? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} }; }
+function injectProductJsonLd(p){ const old=$('#product-jsonld'); if(old) old.remove(); const s=document.createElement('script'); s.type='application/ld+json'; s.id='product-jsonld'; s.textContent=JSON.stringify(productJsonLd(p)); document.head.appendChild(s); }
+function renderProductDetailBySlug(slug){ const p=PRODUCTS.find(x=>x.slug===slug || String(x.id)===String(slug)); const detail=$('#productDetail'); if(!detail) return; if(!p){ detail.classList.remove('hide'); $('#catalogSection')?.classList.add('hide'); $('#cartSection')?.classList.add('hide'); detail.innerHTML='<div class="detail">Товар не найден</div>'; return; } const busy = overlapWithBusy(p, state.startDate, state.endDate); injectProductJsonLd(p); detail.classList.remove('hide'); $('#catalogSection')?.classList.add('hide'); $('#cartSection')?.classList.add('hide'); const left = availableForUser(p); const isDisabled = busy || left===0; const availText = isDisabled? ('Занято'+ (p.busyUntil? ' до '+ new Date(p.busyUntil).toLocaleDateString('ru-RU') : '')) : 'Свободно'; const leftText = left>0 ? (left===1? 'Осталась 1 шт.' : `В наличии: ${left} шт.`) : 'Нет в наличии'; detail.innerHTML=`<div class="detail"><a href="#catalog" class="small">&larr; Вернуться в каталог</a><div style="display:flex;gap:18px;align-items:flex-start;margin-top:8px;flex-wrap:wrap"><div style="flex:1;min-width:260px"><div class="gallery"><img src="${(p.images&&p.images[0])||''}" alt="${p.title}" /></div></div><div style="flex:1.2;min-width:300px"><h2 style="margin-top:0">${p.title}</h2><div class="rating">${stars(p.rating||4.7)}</div><p class="small" style="color:var(--muted)">${p.description||''}</p><div style="height:12px"></div><div><strong>Характеристики:</strong></div><ul>${Object.entries(p.specs||{}).map(([k,v])=>`<li><strong>${k}:</strong> ${v}</li>`).join('')}</ul><div><span class="status badge ${isDisabled? 'busy':'free'}">${availText}</span><span class="badge stock">${leftText}</span></div><div style="height:8px"></div><div class="small" style="color:var(--muted)">Цена: ${t(p.price)} / сутки</div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn add-btn ${isDisabled? 'disabled':''}" ${isDisabled? 'disabled':''} onclick="addToCart(${p.id})">Добавить в корзину</button><a class="btn ghost" href="#catalog">Назад к каталогу</a></div></div></div></div>`; }
+
+/* ---------- Cart logic ---------- */
+function addToCart(productId){ const p = PRODUCTS.find(x=>x.id===productId); if(!p) return; const left = availableForUser(p); if(left<=0){ showToast('Нет в наличии на выбранные даты'); return; } if(overlapWithBusy(p, state.startDate, state.endDate)) { showToast('Этот товар занят на выбранные даты'); return; } const idx = state.cart.findIndex(c=>c.id===p.id); if(idx>=0) state.cart[idx].qty = Math.min((p.stock||1), state.cart[idx].qty+1); else state.cart.push({ id:p.id, title:p.title, price:p.price, qty:1 }); renderSidebarCart(); renderCartSection(); saveState(); renderCatalog(); showToast('Добавлено в корзину'); }
+function changeQty(id, delta){ const i=state.cart.findIndex(c=>c.id===id); if(i<0) return; const p = PRODUCTS.find(x=>x.id===id); if(delta>0){ const max = Number(p?.stock||1); if(state.cart[i].qty>=max){ showToast('Достигнут лимит наличия'); return; } } state.cart[i].qty=Math.max(1,state.cart[i].qty+delta); renderSidebarCart(); renderCartSection(); saveState(); renderCatalog(); }
+function removeFromCart(id){ state.cart = state.cart.filter(c=>c.id!==id); renderSidebarCart(); renderCartSection(); saveState(); renderCatalog(); showToast('Удалено из корзины'); }
+
+/* ---------- Promo ---------- */
+const PROMO_DB = [ { code:'WELCOME10', type:'percent', value:10 }, { code:'RENT5000', type:'amount', value:5000 }, { code:'REF5', type:'percent', value:5 } ];
+function applyPromoIfAny(total){ if(!state.promo) return total; if(state.promo.type==='percent') return Math.max(0, Math.round(total*(100-state.promo.value)/100)); if(state.promo.type==='amount') return Math.max(0, total - state.promo.value); return total; }
+
+/* ---------- Validation & Payload ---------- */
+function validateCheckout(){ if(state.cart.length===0){ alert('Корзина пуста'); return false; } const fn=$('#firstName')?.value.trim(); const ln=$('#lastName')?.value.trim(); const ph=$('#phone')?.value.trim(); const sd=$('#startDate')?.value; const ed=$('#endDate')?.value; if(!fn||!ln||!ph||!sd||!ed){ alert('Заполните: Имя, Фамилию, Телефон и даты аренды'); return false; } if(ed < sd){ alert('Дата окончания раньше даты начала'); return false; } const conflicts = state.cart.filter(ci=> overlapWithBusy(PRODUCTS.find(p=>p.id===ci.id)||{}, sd, ed)); if(conflicts.length){ alert('Некоторые позиции заняты: '+conflicts.map(c=>c.title).join(', ')); return false; } for(const ci of state.cart){ const p=PRODUCTS.find(x=>x.id===ci.id); if(!p) continue; if(ci.qty>Number(p.stock||1)) { alert(`${p.title}: превышает наличие`); return false; } } state.startDate=sd; state.endDate=ed; saveState(); return true; }
+function buildPayload(paymentStatus){ const d=daysBetween(state.startDate, state.endDate); const items=state.cart.map(i=>({ id:i.id, title:i.title, qty:i.qty, price:i.price, sum:i.price*i.qty*d })); const sumPerDay = state.cart.reduce((s,i)=>s+i.price*i.qty,0); const {disc, rate} = durationDiscount(sumPerDay, d); const totalRaw = items.reduce((s,i)=>s+i.sum,0) - disc; const total = applyPromoIfAny(totalRaw); const orderId='ORD-'+Date.now(); let utm={}; try{ utm=JSON.parse(localStorage.getItem('brent_utm')||'{}'); }catch(e){} return { orderId, firstName:$('#firstName')?.value.trim()||'', lastName:$('#lastName')?.value.trim()||'', phone:$('#phone')?.value.trim()||'', email:$('#email')?.value.trim()||'', startDate:state.startDate, endDate:state.endDate, days:d, items, total, discount:{ durationRate:rate, durationAmount: Math.round(sumPerDay*d*rate) }, promo:state.promo||null, sortBy:state.sortBy, filters:{ q:state.q, category:state.category, minPrice:state.minPrice, maxPrice:state.maxPrice }, utm, paymentStatus, createdAt: new Date().toISOString() }; }
+async function postOrder(payload){ // локально всегда кладём заказ
+  const orders = getOrders(); orders.push(payload); saveOrders(orders);
+  if(!ORDER_WEBHOOK_URL){ console.warn('ORDER_WEBHOOK_URL пуст — имитация сохранения'); return {ok:true, json:{mock:true}}; }
+  try{ const r = await fetch(ORDER_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }); if(!r.ok) throw new Error('Ошибка сети'); const json = await r.json(); return {ok:true, json}; }catch(err){ console.error(err); alert('Не удалось отправить заказ — проверьте URL и сеть.'); return {ok:false}; }
+}
+
+/* ---------- Share cart ---------- */
+function buildShareLink(){ const items = state.cart.map(i=>`${i.id}x${i.qty}`).join(','); const params = new URLSearchParams({ items, s:state.startDate||'', e:state.endDate||'', cat:state.category||'all', q:state.q||'', promo: state.promo?.code||'' }); const base = location.origin + location.pathname; return `${base}?${params.toString()}#cart`; }
+function parseShareLink(){ const p=getUrlParams(); const items=p.get('items'); if(items){ const arr=String(items).split(',').filter(Boolean); const newCart=[]; arr.forEach(x=>{ const [id,qty]=x.split('x'); const prod=PRODUCTS.find(pr=>String(pr.id)===String(id)); if(prod) newCart.push({id:prod.id,title:prod.title,price:prod.price,qty:Math.max(1,Number(qty)||1)}); }); if(newCart.length){ state.cart=newCart; }} const s=p.get('s'); const e=p.get('e'); if(s) state.startDate=s; if(e) state.endDate=e; const cat=p.get('cat'); if(cat) state.category=cat; const q=p.get('q'); if(q) state.q=q; const promo=p.get('promo'); if(promo){ const found=PROMO_DB.find(x=>x.code.toUpperCase()===promo.toUpperCase()); if(found) state.promo={code:found.code,type:found.type,value:found.value}; } }
+
+/* ---------- UI nav ---------- */
+function showCatalog(){ $('#catalogSection')?.classList.remove('hide'); $('#productDetail')?.classList.add('hide'); $('#cartSection')?.classList.add('hide'); $('#adminSection')?.classList.add('hide'); $('#adminLoginSection')?.classList.add('hide'); safeText('#titleGoHome','Каталог техники'); }
+function showCart(){ $('#catalogSection')?.classList.add('hide'); $('#productDetail')?.classList.add('hide'); $('#adminSection')?.classList.add('hide'); $('#adminLoginSection')?.classList.add('hide'); $('#cartSection')?.classList.remove('hide'); renderCartSection(); renderSidebarCart(); safeText('#titleGoHome','Корзина'); }
+function showAdmin(){ $('#catalogSection')?.classList.add('hide'); $('#productDetail')?.classList.add('hide'); $('#cartSection')?.classList.add('hide'); if(ADMIN.loggedIn){ $('#adminSection')?.classList.remove('hide'); $('#adminLoginSection')?.classList.add('hide'); safeText('#adminUserTag', ADMIN.user||'Админ'); renderAdmin(); } else { $('#adminLoginSection')?.classList.remove('hide'); $('#adminSection')?.classList.add('hide'); } safeText('#titleGoHome','Админ-панель'); }
+function updateMobileBar(){ const totalEl=$('#grandTotal'); const mobEl=$('#mobCartTotal'); if(!totalEl||!mobEl) return; const total = parseMoney(totalEl.textContent); mobEl.textContent = t(total); }
+
+/* ---------- ADMIN UI ---------- */
+function renderAdmin(){ const root=$('#adminContent'); if(!root) return; const tab=ADMIN.tab; $$('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='dashboard') return adminDashboard(root);
+  if(tab==='inventory') return adminInventory(root);
+  if(tab==='orders') return adminOrders(root);
+  if(tab==='clients') return adminClients(root);
+  if(tab==='settings') return adminSettings(root);
+}
+function adminDashboard(root){ const orders=getOrders(); const revenue=orders.filter(o=>/оплат/i.test(o.paymentStatus)).reduce((s,o)=>s+Number(o.total||0),0); const active=orders.filter(o=> new Date(o.endDate)>=new Date()).length; const popular=topPopular(orders,3).map(x=>`${x.title} (${x.count})`).join(', ')||'—'; root.innerHTML=`<div class="kpi"><div class="box"><div class="small">Всего заказов</div><div style="font-size:20px;font-weight:700">${fmt(orders.length)}</div></div><div class="box"><div class="small">Выручка (оплачено)</div><div style="font-size:20px;font-weight:700">${t(revenue)}</div></div><div class="box"><div class="small">Активных аренд</div><div style="font-size:20px;font-weight:700">${fmt(active)}</div></div><div class="box"><div class="small">Топ товары</div><div style="font-size:16px">${popular}</div></div></div>`; }
+function topPopular(orders, n){ const map=new Map(); orders.forEach(o=>o.items.forEach(it=>{ const k=it.title; map.set(k,(map.get(k)||0)+it.qty); })); return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n).map(([title,count])=>({title,count})); }
+function adminInventory(root){ root.innerHTML=`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="btn small" id="invSave">Сохранить изменения</button><span class="small">Редактируйте ячейки Stock/Busy</span></div><table class="table"><thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена</th><th>Stock</th><th>Статус</th><th>Занято до</th></tr></thead><tbody id="invBody"></tbody></table>`; const tbody=$('#invBody'); PRODUCTS.forEach(p=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${p.id}</td><td>${p.title}</td><td>${p.category}</td><td>${t(p.price)}</td><td contenteditable data-field="stock" data-id="${p.id}">${p.stock||0}</td><td><select data-field="status" data-id="${p.id}"><option value="free" ${p.status==='free'?'selected':''}>free</option><option value="busy" ${p.status==='busy'?'selected':''}>busy</option></select></td><td contenteditable data-field="busyUntil" data-id="${p.id}">${p.busyUntil||''}</td>`; tbody.appendChild(tr); }); $('#invSave')?.addEventListener('click',()=>{ $$('[data-field][data-id]').forEach(el=>{ const id=Number(el.getAttribute('data-id')); const field=el.getAttribute('data-field'); const prod=PRODUCTS.find(p=>p.id===id); if(!prod) return; let val = (el.tagName==='SELECT') ? el.value : el.textContent.trim(); if(field==='stock') val = Number(val)||0; prod[field]=val; }); showToast('Склад сохранён (в памяти страницы)'); renderCatalog(); }); }
+function adminOrders(root){ const orders=getOrders().slice().reverse(); const rows = orders.map(o=>`<tr><td>${o.orderId}</td><td>${o.firstName} ${o.lastName}<div class="small">${o.phone}</div></td><td>${o.startDate} → ${o.endDate}<div class="small">${o.days} дн.</div></td><td>${o.items.map(i=>`${i.title} ×${i.qty}`).join('<br>')}</td><td>${t(o.total)}</td><td><select data-ord="${o.orderId}" class="ord-status"><option ${/ожидает/i.test(o.paymentStatus)?'selected':''}>Ожидает подтверждения оплаты</option><option ${/оплачен/i.test(o.paymentStatus)?'selected':''}>Оплачен (клиент подтвердил)</option><option ${/выдан/i.test(o.paymentStatus)?'selected':''}>Выдан</option><option ${/возвращ/i.test(o.paymentStatus)?'selected':''}>Возвращён</option></select></td></tr>`).join(''); root.innerHTML=`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button id="expCsv" class="btn small">Экспорт CSV</button><input id="ordSearch" class="input" placeholder="Поиск: имя/телефон/товар" style="max-width:280px" /></div><table class="table"><thead><tr><th>№</th><th>Клиент</th><th>Даты</th><th>Позиции</th><th>Сумма</th><th>Статус</th></tr></thead><tbody id="ordersBody">${rows||''}</tbody></table>`; $('#ordSearch')?.addEventListener('input',(e)=>{ const q=e.target.value.toLowerCase(); $$('#ordersBody tr').forEach(tr=>{ tr.style.display = tr.textContent.toLowerCase().includes(q)?'':'none'; }); }); $$('.ord-status').forEach(sel=> sel.addEventListener('change', ()=>{ const id=sel.getAttribute('data-ord'); const list=getOrders(); const idx=list.findIndex(o=>o.orderId===id); if(idx>=0){ list[idx].paymentStatus = sel.value; saveOrders(list); showToast('Статус обновлён'); renderAdmin(); } })); $('#expCsv')?.addEventListener('click', ()=>{ const header=['orderId','firstName','lastName','phone','startDate','endDate','days','items','total','paymentStatus']; const lines=[header.join(',')]; orders.forEach(o=>{ const items=o.items.map(i=>`${i.title}×${i.qty}`).join(' | ').replaceAll(',',';'); lines.push([o.orderId,o.firstName,o.lastName,o.phone,o.startDate,o.endDate,o.days,`"${items}"`,o.total,o.paymentStatus].join(',')); }); const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='orders.csv'; a.click(); URL.revokeObjectURL(url); }); }
+function adminClients(root){ const orders=getOrders(); const map=new Map(); orders.forEach(o=>{ const key=(o.phone||'')+'|'+(o.firstName||'')+'|'+(o.lastName||''); const prev=map.get(key)||{phone:o.phone, name:`${o.firstName||''} ${o.lastName||''}`.trim(), count:0, total:0}; prev.count += 1; prev.total += Number(o.total||0); map.set(key, prev); }); const rows=[...map.values()].sort((a,b)=>b.total-a.total).map(c=>`<tr><td>${c.name||'—'}<div class="small">${c.phone||''}</div></td><td>${c.count}</td><td>${t(c.total)}</td><td>${c.total>=500000?'<span class="tag">VIP</span>':''}</td></tr>`).join(''); root.innerHTML=`<table class="table"><thead><tr><th>Клиент</th><th>Заказов</th><th>Сумма</th><th>Метки</th></tr></thead><tbody>${rows||''}</tbody></table>`; }
+function adminSettings(root){ root.innerHTML=`<div class="small">URL вебхука заказов:</div><input class="input" value="${ORDER_WEBHOOK_URL||''}" disabled /><div class="small" style="margin-top:10px">Вход в админку защищён локально. Для прода используйте backend/JWT и роли.</div>`; }
+
+/* ---------- Events ---------- */
+$$('.cat-btn').forEach(b=> b.addEventListener('click', ()=>{ $$('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.category=b.dataset.cat; renderCatalog(); }));
+$('#searchInput')?.addEventListener('input', ()=> renderCatalog());
+$('#topCartBtn')?.addEventListener('click', ()=> location.hash='cart');
+$('#goToCartBtn')?.addEventListener('click', ()=> location.hash='cart');
+$('#chooseMoreBtn')?.addEventListener('click', ()=> { location.hash='catalog'; });
+$('#sortBy')?.addEventListener('change', ()=>{ state.sortBy=$('#sortBy').value; saveState(); renderCatalog(); });
+$('#minPrice')?.addEventListener('input', ()=> renderCatalog());
+$('#maxPrice')?.addEventListener('input', ()=> renderCatalog());
+$('#clearFilters')?.addEventListener('click', ()=>{ state.q=''; const si=$('#searchInput'); if(si) si.value=''; state.minPrice=null; state.maxPrice=null; setPriceBounds(); state.promo=null; $$('.filter-chip').forEach(ch=>ch.classList.remove('active')); state.category='all'; $$('.cat-btn').forEach(x=>x.classList.remove('active')); const allBtn=$$(`.cat-btn[data-cat="all"]`)[0]; if(allBtn) allBtn.classList.add('active'); renderCatalog(); showToast('Фильтры сброшены'); });
+
+function setMinDates(){ const min=todayStr(); ['globalStart','startDate'].forEach(id=>{ const el=$('#'+id); if(!el) return; el.min=min; if(!el.value) el.value=min; }); const ge=$('#globalEnd'); const se=$('#endDate'); if(ge && $('#globalStart')){ if(!ge.value) ge.value=$('#globalStart').value; } if(se && $('#startDate')){ if(!se.value) se.value=$('#startDate').value; } }
+function syncDatesToCart(){ const gs=$('#globalStart'); const ge=$('#globalEnd'); const sd=$('#startDate'); const ed=$('#endDate'); if(gs&&sd) sd.value=gs.value; if(ge&&ed) ed.value=ge.value; state.startDate=sd?.value||state.startDate; state.endDate=ed?.value||state.endDate; renderCartSection(); renderCatalog(); showToast('Даты применены'); }
+
+$('#globalStart')?.addEventListener('change', ()=>{ const s=$('#globalStart').value; const e=$('#globalEnd'); if(e && e.value<s) e.value=s; state.startDate=s; renderCatalog(); saveState(); });
+$('#globalEnd')?.addEventListener('change', ()=>{ const e=$('#globalEnd').value; const s=$('#globalStart'); if(s && e<s.value) s.value=e; state.endDate=e; renderCatalog(); saveState(); });
+$('#applyDatesBtn')?.addEventListener('click', syncDatesToCart);
+$('#startDate')?.addEventListener('change', ()=>{ state.startDate=$('#startDate').value; const e=$('#endDate'); if(e && e.value<state.startDate) e.value=state.startDate; renderCartSection(); renderCatalog(); saveState(); });
+$('#endDate')?.addEventListener('change', ()=>{ state.endDate=$('#endDate').value; renderCartSection(); renderCatalog(); saveState(); });
+
+$('#checkoutBtn')?.addEventListener('click', async ()=>{ if(!validateCheckout()) return; const payload = buildPayload('Ожидает подтверждения оплаты'); const res = await postOrder(payload); if(res.ok){ const n=$('#checkoutNotice'); if(n) n.textContent='Заказ сохранён. Нажмите «Оплатить QR» для оплаты.'; showToast('Заказ сохранён'); }});
+$('#openPayBtn')?.addEventListener('click', ()=>{ if(!validateCheckout()) return; const amount = parseMoney($('#grandTotal')?.textContent||'0'); safeText('#qrAmount', t(amount)); const payloadText = `${PAY_LINK_BASE}?amount=${amount}&order=${encodeURIComponent(($('#firstName')?.value||'') + ' ' + ($('#lastName')?.value||''))}&id=${Date.now()}`; const qrUrl = `${QR_API_BASE}?size=280x280&data=${encodeURIComponent(payloadText)}`; const img=$('#kaspiQr'); if(img) img.src = qrUrl; $('#qrModal')?.classList.remove('hide'); });
+$('#closeQrModal')?.addEventListener('click', ()=> $('#qrModal')?.classList.add('hide'));
+$('#paidBtnModal')?.addEventListener('click', async ()=>{ if(!validateCheckout()) return; const payload = buildPayload('Оплачен (клиент подтвердил)'); const res = await postOrder(payload); if(res.ok){ $('#qrModal')?.classList.add('hide'); alert('Оплата подтверждена — спасибо! Менеджер свяжется с вами.'); state.cart=[]; renderSidebarCart(); renderCartSection(); saveState(); renderCatalog(); location.hash='catalog'; }});
+$('#confirmPaidBtn')?.addEventListener('click', ()=>{ $('#qrModal')?.classList.remove('hide'); });
+$('#copyPayLink')?.addEventListener('click', ()=>{ const amount = parseMoney($('#grandTotal')?.textContent||'0'); const link = `${PAY_LINK_BASE}?amount=${amount}&order=${encodeURIComponent(($('#firstName')?.value||'') + ' ' + ($('#lastName')?.value||''))}&id=${Date.now()}`; copyToClipboard(link); });
+
+$('#applyPromo')?.addEventListener('click', ()=>{ const code = ($('#promo')?.value||'').trim().toUpperCase(); if(!code){ state.promo=null; const pn=$('#promoNote'); if(pn) pn.textContent=''; renderCartSection(); showToast('Промокод очищен'); return; } const found = PROMO_DB.find(p=>p.code===code); if(!found){ const pn=$('#promoNote'); if(pn) pn.textContent='Промокод не найден'; state.promo=null; renderCartSection(); return; } state.promo = {code:found.code, type:found.type, value:found.value}; const pn=$('#promoNote'); if(pn) pn.textContent='Промокод применён'; renderCartSection(); showToast('Промокод применён'); });
+$$('.filter-chip').forEach(ch=> ch.addEventListener('click', ()=>{ ch.classList.toggle('active'); renderCatalog(); }))
+
+$('#shareCartBtn')?.addEventListener('click', ()=>{ const link=buildShareLink(); copyToClipboard(link); });
+$('#mobOpenCart')?.addEventListener('click', ()=> location.hash='cart');
+
+// brand/nav handlers
+const safeNav = (hash)=>{ location.hash = hash; };
+$('#brandGoHome')?.addEventListener('click', ()=> safeNav('catalog'));
+$('#titleGoHome')?.addEventListener('click', ()=> safeNav('catalog'));
+$('#navCatalog')?.addEventListener('click', ()=> safeNav('catalog'));
+$('#navCart')?.addEventListener('click', ()=> safeNav('cart'));
+$('#openAdmin')?.addEventListener('click', ()=> safeNav('admin'));
+$('#navAdmin')?.addEventListener('click', ()=> safeNav('admin'));
+
+// ADMIN events
+$('#adminDoLogin')?.addEventListener('click', ()=>{ const login=$('#adminLogin')?.value.trim()||''; const pass=$('#adminPassword')?.value||''; if(login===ADMIN_LOGIN && pass===ADMIN_PASSWORD){ ADMIN.loggedIn=true; ADMIN.user=login; localStorage.setItem('brent_admin', JSON.stringify({u:login, t:Date.now()})); showToast('Вход выполнен'); showAdmin(); } else { alert('Неверный логин или пароль'); }});
+$('#adminLogout')?.addEventListener('click', ()=>{ ADMIN.loggedIn=false; ADMIN.user=null; localStorage.removeItem('brent_admin'); showToast('Вы вышли'); showAdmin(); });
+$$('.tab').forEach(tab=> tab.addEventListener('click', ()=>{ ADMIN.tab=tab.dataset.tab; renderAdmin(); }));
+
+// phone mask
+$('#phone')?.addEventListener('input', (e)=>{ const v=e.target.value.replace(/\D/g,''); let out='+7 '; if(v.startsWith('7')){ const s=v.slice(1); out += `(${(s.slice(0,3)).padEnd(3,'_')}) ${(s.slice(3,6)||'___')} ${(s.slice(6,8)||'__')} ${(s.slice(8,10)||'__')}`; } else { out += `(${(v.slice(0,3)).padEnd(3,'_')}) ${(v.slice(3,6)||'___')} ${(v.slice(6,8)||'__')} ${(v.slice(8,10)||'__')}`; } e.target.value=out.trim(); });
+
+/* ---------- Router ---------- */
+function handleRoute(){ const h = location.hash.replace(/^#/, ''); const qp = getUrlParams(); const wantAdmin = h==='admin' || qp.get('admin')==='1'; if(!h || h==='catalog'){ showCatalog(); return; } if(h==='cart'){ showCart(); return; } if(h.startsWith('product/')){ const [,slug]=h.split('/'); renderProductDetailBySlug(slug); $('#catalogSection')?.classList.add('hide'); $('#cartSection')?.classList.add('hide'); return; } if(wantAdmin || h==='admin'){ showAdmin(); return; } showCatalog(); }
+window.addEventListener('hashchange', handleRoute);
+
+/* ---------- Init ---------- */
+async function restoreUI(){ safeText('#yearNow', String(new Date().getFullYear())); captureUtm(); loadState(); setMinDates(); await fetchProducts(); setPriceBounds(); // admin session
+  try{ const raw=localStorage.getItem('brent_admin'); if(raw){ const o=JSON.parse(raw); ADMIN.loggedIn=true; ADMIN.user=o.u; } }catch(e){}
+  if(state.q) { const si=$('#searchInput'); if(si) si.value=state.q; }
+  if(state.category){ const btn=$$(`.cat-btn[data-cat="${state.category}"]`)[0]; if(btn){ $$('.cat-btn').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); } }
+  if(state.sortBy && $('#sortBy')) $('#sortBy').value=state.sortBy;
+  renderCatalog(); renderSidebarCart(); renderCartSection(); }
+
+// --- Runtime tests (smoke) ---
+function runDevTests(){ try{ state.cart=[]; const p=PRODUCTS[0]; const init=availableForUser(p); addToCart(p.id); const after=availableForUser(p); console.assert(after===Math.max(0,init-1),'Stock dec on add'); for(let i=0;i<20;i++) addToCart(p.id); const left=availableForUser(p); console.assert(left>=0,'Non-negative left'); console.log('%cDEV TESTS: OK','color:#16a34a'); }catch(e){ console.error('DEV TESTS FAILED', e); }}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', () => { restoreUI().catch(err=>{ console.error(err); showToast('Ошибка инициализации'); }); handleRoute(); runDevTests(); });
+} else {
+  restoreUI().catch(err=>{ console.error(err); showToast('Ошибка инициализации'); }); handleRoute(); runDevTests();
+}
+</script>
+</body>
+</html>
